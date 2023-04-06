@@ -1,0 +1,10 @@
+@icon,,18,17,16,16,0,left,top,#7AA2F7,#7AA2F7,~/.config/jgmenu/search.png
+@search,,42,15,150,20,2,left,top,#c0caf5,#7aa2f7,Search
+^sep(-----------)
+Kitty,kitty,/home/wyatt/.config/jgmenu/kitty.png
+Firefox,firefox,/home/wyatt/.config/jgmenu/firefox.png
+Discord,discord,/home/wyatt/.config/jgmenu/discord.png
+Thunar,thunar,/home/wyatt/.config/jgmenu/thunar.png
+VSCode,code,/home/wyatt/.config/jgmenu/vscode.png
+Lollypop,lollypop,/home/wyatt/.config/jgmenu/music.png
+^sep(-----------)
