@@ -1,4 +1,4 @@
-@icon,,18,17,16,16,0,left,top,#7AA2F7,#7AA2F7,~/.config/jgmenu/search.png
+@icon,,18,17,16,16,0,left,top,#7AA2F7,#7AA2F7,/home/wyatt/.config/jgmenu/search.png
 @search,,42,15,150,20,2,left,top,#c0caf5,#7aa2f7,Search
 ^sep(-----------)
 Kitty,kitty,/home/wyatt/.config/jgmenu/kitty.png
