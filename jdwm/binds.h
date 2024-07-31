@@ -40,10 +40,10 @@ static const Key keys[] = {
         { Win,           XK_Tab,    view,            {0} },
         { Win,           XK_0,      view,            {.ui = ~0 } },
         { Win|Shift,     XK_0,      tag,             {.ui = ~0 } },
-        { Win|Shift,     XK_o,      shiftboth,       { .i = +1 } },
-        { Win|Shift,     XK_i,      shiftboth,       { .i = -1 } },
-        { Win|Control,   XK_o,      shiftviewclients,{ .i = +1 } },
-        { Win|Control,   XK_i,      shiftviewclients,{ .i = -1 } },
+        { Win|Shift,     XK_Up,     shiftboth,       { .i = +1 } },
+        { Win|Shift,     XK_Down,   shiftboth,       { .i = -1 } },
+        //{ Win|Control,   XK_o,      shiftviewclients,{ .i = +1 } }, Bugged, will fix or remove
+        //{ Win|Control,   XK_i,      shiftviewclients,{ .i = -1 } }, Bugged, will fix or remove
         { Win,           XK_o,      shiftview,       { .i = +1 } },
         { Win,           XK_i,      shiftview,       { .i = -1 } },
         
@@ -54,15 +54,6 @@ static const Key keys[] = {
         { Win|Shift,     XK_Right,    tagmon,      {.i = +1 } },
         { Win|Shift,     XK_Left,     focusmon,    {.i = -1 } },
         { Win|Shift,     XK_Right,    focusmon,    {.i = +1 } },
-
-
-        // With my implimentation these are redundant, but kept here in case you wish to re-enable them.
-        // As it stands, I send the view with any window sent to another tag, meaning that these and
-        // shiftview/shiftboth do the exact same thing as the below functions. 
-        /*{ Win|Shift,     XK_h,      shiftviewclients,    { .i = -1 }},
-        { Win|Shift,     XK_l,      shiftviewclients,    { .i = +1 }},
-        { Win|Control,   XK_h,      shiftswaptags,       { .i = -1 }},
-        { Win|Controlm   XK_l,      shiftswaptags,       { .i = +1 }},*/
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,12 +92,13 @@ static const Key keys[] = {
         { Win,              XK_t,           setlayout,         {.v = &layouts[0]} },
         { Win,              XK_e,           setlayout,         {.v = &layouts[1]} },
         { Win,              XK_m,           setlayout,         {.v = &layouts[2]} },
+        { Win,              XK_l,           spawn,             SHCMD( "rofi_layoutmenu.sh " ROFITHEME ) },
         { Win,              XK_Up,          focusstack,        {.i = +1 } },
         { Win,              XK_Down,        focusstack,        {.i = -1 } },
         { Win|Control,      XK_i,           incnmaster,        {.i = +1 } },
         { Win|Control,      XK_d,           incnmaster,        {.i = -1 } },
-        { Win,              XK_h,           setmfact,          {.f = -0.05} },
-        { Win,              XK_l,           setmfact,          {.f = +0.05} },
+        { Win|Shift,        XK_h,           setmfact,          {.f = -0.05} },
+        { Win|Shift,        XK_l,           setmfact,          {.f = +0.05} },
         { Win|Shift,        XK_Return,      zoom,              {0} },
         { Win,              XK_comma,       layoutscroll,      {.i = -1 } },
         { Win,              XK_period,      layoutscroll,      {.i = +1 } },
@@ -117,12 +109,14 @@ static const Key keys[] = {
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-                                /* jeff_dwm misc Keys: */
+                                /* jdwm misc Keys: */
 
         //Modifier              Key             Function          Argument
         { Alt,                  XK_Tab,         spawn,            SHCMD( "rofi -no-fixed-num-lines -show window -theme " ROFITHEME ) }, // Window Switcher    
         { Win,                  XK_d,           spawn,            SHCMD( "rofi -no-fixed-num-lines -show drun -theme " ROFITHEME ) }, // App Launcher
         { Win,                  XK_p,           spawn,            SHCMD( "rofi_powermenu.sh " ROFITHEME ) }, // Power Menu 
+        { Win,                  XK_k,           spawn,            SHCMD( "rofi -show calc -modi calc -no-show-match -no-sort -theme " ROFITHEME ) }, // Calculator
+        { Win,                  XK_h,           spawn,            SHCMD( "rofi_jdwm_theme.sh " ROFITHEME ) },
         { Win,                  XK_w,           spawn,            SHCMD( "BROWSER" ) },
         { Win,                  XK_c,           spawn,            SHCMD( "CODE_EDITOR" ) },
         { Win,                  XK_a,           spawn,            SHCMD( "FILE_MANAGER" ) },
@@ -177,6 +171,7 @@ static const Key keys[] = {
         { 0,            XK_Standby,                 spawn,      SHCMD("systemctl suspend") },
         { 0,            XK_Suspend,                 spawn,      SHCMD("systemctl suspend") },
         { 0,            XK_Hibernate,               spawn,      SHCMD("systemctl hibernate") },
+        { 0,            XK_Calculator,              spawn,      SHCMD( "rofi -show calc -modi calc -no-show-match -no-sort -theme " ROFITHEME ) },
 
         // Below are not set up, as it varies a lot between systems. Use a program that works for your specific system.
         //{ 0,          XK_MonBrightnessUp,         spawn,      SHCMD("") },
@@ -199,47 +194,44 @@ static const Key keys[] = {
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin
+// Click can be Tags, LayoutSymbol, StatusText, WindowTitle, ClientWindow, or Desktop
 static const Button buttons[] = {
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
                                 /* Left Mouse Button: */
 
         //Click           Key            Button          Function        Argument 
-        { ClkLtSymbol,    0,             LeftClick,      setlayout,      {0} },
-        { ClkTagBar,      0,             LeftClick,      view,           {0} },
+        { LayoutSymbol,   0,             LeftClick,      setlayout,      {0} },
+        { Tags,           0,             LeftClick,      view,           {0} },
+        { ClientWindow,  Win,            LeftClick,      movemouse,      {0} },
+        { ClientWindow,  Win|Control,    LeftClick,      floatandmove,   {0} },
 
         // Used to send focus and the window to a new monitor.
         // Is it simple? Yes. Is it lazy? Yes. Is it the best option? Maybe, but im lazy.
-        { ClkTagBar,      Win,          LeftClick,      tag,            {0} },
-        { ClkTagBar,      Win,          LeftClick,      view,           {0} },
+        { Tags,          Win,            LeftClick,      tag,            {0} },
+        { Tags,          Win,            LeftClick,      view,           {0} },
 
-        { ClkClientWin,   Win,          LeftClick,      movemouse,      {0} },
-        { ClkClientWin,   Win|Control,  LeftClick,      floatandmove,   {0} },
+        
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
                                 /* Middle Mouse Button: */
 
-        //Click           Key           Button           Function          Argument
-        { ClkWinTitle,    0,            MiddleClick,     spawn,            SHCMD( "TERM" ) },
-        { ClkClientWin,   Win,          MiddleClick,     togglefloating,   {0} },
+        //Click          Key             Button           Function        Argument
+        { WindowTitle,   0,              MiddleClick,     spawn,          SHCMD( "TERM" ) }, 
+        { LayoutSymbol,  0,              MiddleClick,     spawn,          SHCMD( "rofi_jdwm_theme.sh " ROFITHEME ) },
+        { ClientWindow,  Win,            MiddleClick,     togglefloating, {0} },
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
                                /* Right Mouse Button: */
 
-        //Click           Key           Button             Function        Argument
-        { ClkLtSymbol,    0,            RightClick,        spawn,          SHCMD( "rofi_layoutmenu.sh " ROFITHEME ) },
-        { ClkTagBar,      0,            RightClick,        toggleview,     {0} },
-        { ClkClientWin,   Win,          RightClick,        resizemouse,    {0} },
-
-
-        // Optional, enables right clicking on the desktop to spawn a jgmenu instance
-        //{ ClkRootWin,     0,            RightClick,        spawn,          {.v = jgmenucmd } },
+        //Click          Key             Button           Function        Argument
+        { LayoutSymbol,  0,              RightClick,      spawn,          SHCMD( "rofi_jdwm_layoutmenu.sh " ROFITHEME ) },
+        { Tags,          0,              RightClick,      toggleview,     {0} },
+        { ClientWindow,  Win,            RightClick,      resizemouse,    {0} },
 
 };
